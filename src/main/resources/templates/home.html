@@ -1,0 +1,27 @@
+<html>
+<body>
+<pre>
+    #set($title = "winter's coming")
+    #parse("header.html")
+
+    $!{value1}
+    colors: $!{colors}
+    #foreach($color in $colors)
+        This is Color: $color
+    #end
+
+    #foreach($ky in $map.entrySet())
+        Number: $ky.key, Value: $ky.value
+    #end
+
+    #macro(render_color,$index,$color)
+        Color Render Macro $index,$color
+    #end
+
+    #foreach($color in $colors)
+        #render_color($foreach.index,$color)
+    #end
+
+</pre>
+</body>
+</html>
