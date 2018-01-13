@@ -1,6 +1,7 @@
 package com.winter.demo3.util;
 
 
+import com.alibaba.fastjson.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,6 +10,19 @@ import java.security.MessageDigest;
 public class DemoUtil {
     private static final Logger logger = LoggerFactory.getLogger(DemoUtil.class);
 
+    public static int ANONYMOUS_USERID = 1024;
+    public static String getJSONString(int code){
+        JSONObject json = new JSONObject();
+        json.put("code",code);
+        return json.toJSONString();
+    }
+
+    public static String getJSONString(int code, String msg){
+        JSONObject json = new JSONObject();
+        json.put("code",code);
+        json.put("msg",msg);
+        return json.toJSONString();
+    }
     public static String MD5(String key) {
         char hexDigits[] = {
                 '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
