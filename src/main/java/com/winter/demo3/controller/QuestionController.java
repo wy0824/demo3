@@ -2,6 +2,7 @@ package com.winter.demo3.controller;
 
 import com.winter.demo3.model.*;
 import com.winter.demo3.service.CommentService;
+import com.winter.demo3.service.LikeService;
 import com.winter.demo3.service.QuestionService;
 import com.winter.demo3.service.UserService;
 import com.winter.demo3.util.DemoUtil;
@@ -28,6 +29,9 @@ public class QuestionController {
     UserService userService;
     @Autowired
     CommentService commentService;
+
+    @Autowired
+    LikeService likeService;
 
     @RequestMapping(value="/question/add",method = {RequestMethod.POST})
     @ResponseBody
@@ -57,11 +61,18 @@ public class QuestionController {
         Question question = questionService.selectById(qid);
         model.addAttribute("question",question);
         model.addAttribute("user",userService.getUser(question.getUserId()));
+
         List<Comment> commentList = commentService.getCommentByEntity(qid, EntityType.ENTITY_QUESTION);
         List<ViewObject> comments = new ArrayList<ViewObject>();
         for(Comment comment : commentList){
             ViewObject vo = new ViewObject();
             vo.set("comment",comment);
+            if(hostHolder.getUser()==null){
+                vo.set("liked",0);
+            }else{
+                vo.set("liked",likeService.getLikeStatus(hostHolder.getUser().getId(),EntityType.ENTITY_COMMENT,comment.getId()));
+            }
+            vo.set("likeCount",likeService.getLikeCount(EntityType.ENTITY_COMMENT,comment.getId()));
             vo.set("user",userService.getUser(comment.getUserId()));
             comments.add(vo);
         }
