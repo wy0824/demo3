@@ -29,7 +29,7 @@ public class CommentService {
         return commentDAO.getCommentCount(entityId,entityType);
     }
 
-    public boolean deleteComment(int commentId){
-        return commentDAO.updateStatus(commentId,1) > 0;
+    public void deleteComment(int entityId,int entityType){
+        commentDAO.updateStatus(entityId,entityType,1);
     }
 }

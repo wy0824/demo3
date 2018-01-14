@@ -25,8 +25,10 @@ public interface CommentDAO {
             " where entity_id=#{entityId} and entity_type=#{entityType}"})
     int getCommentCount(@Param("entityId") int entityId,@Param("entityType") int entityType);
 
-    @Update({"update comment set status=#{status} where id=#{id}"})
-    int updateStatus(@Param("id") int id,@Param("status") int status);
+    @Update({"update ",TABLE_NAME," set status=#{status} where entity_id=#{entityId} and entity_type=#{entityType}"})
+    void updateStatus(@Param("entityId") int entityId,
+                     @Param("entityType") int entityType,
+                     @Param("status") int status);
 //    @Update({"update ",TABLE_NAME, " set password=#{password} where id=#{id}"})
 //    void updatePassword(User user);
 //

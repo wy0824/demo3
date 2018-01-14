@@ -32,22 +32,23 @@ public class CommentController {
                              @RequestParam("content") String content){
         try {
             Comment comment = new Comment();
-            comment.setContent(content);
             if (hostHolder.getUser() != null) {
                 comment.setUserId(hostHolder.getUser().getId());
             } else {
                 comment.setUserId(DemoUtil.ANONYMOUS_USERID);
 //            return "redirect:/relogin"
             }
+            comment.setContent(content);
             comment.setCreatedDate(new Date());
             comment.setEntityType(EntityType.ENTITY_QUESTION);//添加问题？？？
             comment.setEntityId(questionId);
+            comment.setStatus(0);
             commentService.addComment(comment);
             int count = commentService.getCommentCount(comment.getEntityId(),comment.getEntityType());
             questionService.updateCommentCount(comment.getEntityId(),count);
         }catch (Exception e){
             logger.error("增加评论失败 "+e.getMessage());
         }
-        return "redirect:/question/" + questionId;
+        return "redirect:/question/" + String.valueOf(questionId);
     }
 }
