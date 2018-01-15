@@ -1,5 +1,8 @@
 package com.winter.demo3.controller;
 
+import com.winter.demo3.async.EventModel;
+import com.winter.demo3.async.EventProducer;
+import com.winter.demo3.async.EventType;
 import com.winter.demo3.service.UserService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -19,6 +22,8 @@ public class LoginController {
 
     @Autowired
     UserService userService;
+    @Autowired
+    EventProducer eventProducer;
     @RequestMapping(path={"/reg/"},method = {RequestMethod.POST})
     public String reg(Model model,
                       @RequestParam("username") String username,
@@ -27,7 +32,7 @@ public class LoginController {
                       @RequestParam(value = "rememberme",defaultValue = "false") boolean rememberme,
                       HttpServletResponse response){
         try {
-            Map<String, String> map = userService.register(username, password);
+            Map<String, Object> map = userService.register(username, password);
             if (map.containsKey("ticket")) {
                 Cookie cookie = new Cookie("ticket",map.get("ticket").toString());
                 cookie.setPath("/");
@@ -35,6 +40,7 @@ public class LoginController {
                     cookie.setMaxAge(3600*24*5);
                 }
                 response.addCookie(cookie);
+
                 if(StringUtils.isNotBlank(next)){
                     return "redirect:" + next;
                 }
@@ -59,7 +65,7 @@ public class LoginController {
                         @RequestParam(value="rememberme",defaultValue = "false") boolean rememberme,
                         HttpServletResponse response){
         try {
-            Map<String, String> map = userService.login(username, password);
+            Map<String, Object> map = userService.login(username, password);
             if (map.containsKey("ticket")) {
                 Cookie cookie = new Cookie("ticket",map.get("ticket").toString());
                 cookie.setPath("/");
@@ -67,6 +73,11 @@ public class LoginController {
                     cookie.setMaxAge(3600*24*5);
                 }
                 response.addCookie(cookie);
+
+//                eventProducer.fireEvent(new EventModel(EventType.LOGIN)
+//                        .setExts("username",username).setExts("email","yuandongxu@zju.edu.cn")
+//                        .setActorId((int)map.get("userId")));
+
                 if(StringUtils.isNotBlank(next)){
                     return "redirect:" + next;
                 }
