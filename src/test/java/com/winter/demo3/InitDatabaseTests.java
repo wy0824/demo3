@@ -2,8 +2,11 @@ package com.winter.demo3;
 
 import com.winter.demo3.dao.QuestionDAO;
 import com.winter.demo3.dao.UserDAO;
+import com.winter.demo3.model.EntityType;
 import com.winter.demo3.model.Question;
 import com.winter.demo3.model.User;
+import com.winter.demo3.service.FollowService;
+import com.winter.demo3.util.JedisAdapter;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,18 +29,25 @@ public class InitDatabaseTests {
 
     @Autowired
     QuestionDAO questionDAO;
-
+    @Autowired
+    FollowService followService;
+    @Autowired
+    JedisAdapter jedisAdapter;
     @Test
     public void InitDatabaseTests(){
         Random random = new Random();
+        jedisAdapter.getJedis().flushDB();
         for(int i = 0; i < 11; ++i){
             User user = new User();
             user.setHeadUrl(String.format("http://images.nowcoder.com/head/%dt.png", random.nextInt(1000)));
-            user.setName(String.format("USER%d",i));
+            user.setName(String.format("USER%d",i+1));
             user.setPassword("");
             user.setSalt("");
             userDAO.addUser(user);
 
+            for(int j = 1; j < i; ++j){
+                followService.follow(j, EntityType.ENTITY_USER,i);
+            }
             user.setPassword("xxx");
             userDAO.updatePassword(user);
             Question question = new Question();
@@ -51,8 +61,8 @@ public class InitDatabaseTests {
             questionDAO.addQuestion(question);
         }
         Assert.assertEquals("xxx",userDAO.selectByid(1).getPassword());
-        userDAO.deleteByid(1);
-        Assert.assertNull(userDAO.selectByid(1));
+//        userDAO.deleteByid(1);
+//        Assert.assertNull(userDAO.selectByid(1));
 //        System.out.print(questionDAO.selectLatestQuestions(0,0,10));
     }
 

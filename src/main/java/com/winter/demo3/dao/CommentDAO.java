@@ -32,6 +32,9 @@ public interface CommentDAO {
     void updateStatus(@Param("entityId") int entityId,
                      @Param("entityType") int entityType,
                      @Param("status") int status);
+
+    @Select({"select count(id) from ",TABLE_NAME," where user_id=#{userId}"})
+    int getUserCommentCount(int userId);
 //    @Update({"update ",TABLE_NAME, " set password=#{password} where id=#{id}"})
 //    void updatePassword(User user);
 //

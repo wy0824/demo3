@@ -56,7 +56,12 @@ public class LoginController {
         }
 
     }
-
+    @RequestMapping(path={"/reglogin"},method = {RequestMethod.GET})
+    public String reglogin(Model model,
+                          @RequestParam(value = "next",required = false) String next){
+        model.addAttribute("next",next);
+        return "login";
+    }
     @RequestMapping(path={"/login/"},method = {RequestMethod.POST})
     public String login(Model model,
                         @RequestParam("username") String username,
@@ -93,12 +98,7 @@ public class LoginController {
 
     }
 
-    @RequestMapping(path={"/relogin"},method = {RequestMethod.GET})
-    public String relogin(Model model,
-                          @RequestParam(value = "next",required = false) String next){
-        model.addAttribute("next",next);
-        return "login";
-    }
+
 
     @RequestMapping(path={"/logout"},method = {RequestMethod.GET,RequestMethod.POST})
     public String logout(@CookieValue("ticket") String ticket){

@@ -1,10 +1,7 @@
 package com.winter.demo3.controller;
 
 import com.winter.demo3.model.*;
-import com.winter.demo3.service.CommentService;
-import com.winter.demo3.service.LikeService;
-import com.winter.demo3.service.QuestionService;
-import com.winter.demo3.service.UserService;
+import com.winter.demo3.service.*;
 import com.winter.demo3.util.DemoUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +29,52 @@ public class QuestionController {
 
     @Autowired
     LikeService likeService;
+    @Autowired
+    FollowService followService;
+
+    @RequestMapping(value="/question/{qid}")
+    public String questionDetail(Model model,@PathVariable("qid") int qid){
+        Question question = questionService.selectById(qid);
+        model.addAttribute("question",question);
+        model.addAttribute("user",userService.getUser(question.getUserId()));
+
+        List<Comment> commentList = commentService.getCommentByEntity(qid, EntityType.ENTITY_QUESTION);
+        List<ViewObject> comments = new ArrayList<ViewObject>();
+        for(Comment comment : commentList){
+            ViewObject vo = new ViewObject();
+            vo.set("comment",comment);
+            if(hostHolder.getUser()==null){
+                vo.set("liked",0);
+            }else{
+                vo.set("liked",likeService.getLikeStatus(hostHolder.getUser().getId(),EntityType.ENTITY_COMMENT,comment.getId()));
+            }
+            vo.set("likeCount",likeService.getLikeCount(EntityType.ENTITY_COMMENT,comment.getId()));
+            vo.set("user",userService.getUser(comment.getUserId()));
+            comments.add(vo);
+        }
+        model.addAttribute("comments",comments);
+
+        List<ViewObject> followUsers = new ArrayList<ViewObject>();
+        List<Integer> users = followService.getFollowers(EntityType.ENTITY_QUESTION,qid,20);
+        for(Integer userId : users){
+            ViewObject vo = new ViewObject();
+            User u = userService.getUser(userId);
+            if(u == null){
+                continue;
+            }
+            vo.set("name",u.getName());
+            vo.set("headUrl",u.getHeadUrl());
+            vo.set("id",u.getId());
+            followUsers.add(vo);
+        }
+        model.addAttribute("followUsers",followUsers);
+        if(hostHolder.getUser() != null){
+            model.addAttribute("followed",followService.isFollower(hostHolder.getUser().getId(),EntityType.ENTITY_QUESTION,qid));
+        }else{
+            model.addAttribute("followed",false);
+        }
+        return "detail";
+    }
 
     @RequestMapping(value="/question/add",method = {RequestMethod.POST})
     @ResponseBody
@@ -56,27 +99,5 @@ public class QuestionController {
         return DemoUtil.getJSONString(1,"失败");
     }
 
-    @RequestMapping(value="/question/{qid}")
-    public String questionDetail(Model model,@PathVariable("qid") int qid){
-        Question question = questionService.selectById(qid);
-        model.addAttribute("question",question);
-        model.addAttribute("user",userService.getUser(question.getUserId()));
 
-        List<Comment> commentList = commentService.getCommentByEntity(qid, EntityType.ENTITY_QUESTION);
-        List<ViewObject> comments = new ArrayList<ViewObject>();
-        for(Comment comment : commentList){
-            ViewObject vo = new ViewObject();
-            vo.set("comment",comment);
-            if(hostHolder.getUser()==null){
-                vo.set("liked",0);
-            }else{
-                vo.set("liked",likeService.getLikeStatus(hostHolder.getUser().getId(),EntityType.ENTITY_COMMENT,comment.getId()));
-            }
-            vo.set("likeCount",likeService.getLikeCount(EntityType.ENTITY_COMMENT,comment.getId()));
-            vo.set("user",userService.getUser(comment.getUserId()));
-            comments.add(vo);
-        }
-        model.addAttribute("comments",comments);
-        return "detail";
-    }
 }

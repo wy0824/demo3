@@ -1,5 +1,9 @@
 package com.winter.demo3.controller;
 
+import com.winter.demo3.async.EventHandler;
+import com.winter.demo3.async.EventModel;
+import com.winter.demo3.async.EventProducer;
+import com.winter.demo3.async.EventType;
 import com.winter.demo3.model.Comment;
 import com.winter.demo3.model.EntityType;
 import com.winter.demo3.model.HostHolder;
@@ -25,6 +29,8 @@ public class CommentController {
     CommentService commentService;
     @Autowired
     QuestionService questionService;
+    @Autowired
+    EventProducer eventProducer;
     private static final Logger logger = LoggerFactory.getLogger(CommentController.class);
 
     @RequestMapping(path = {"/addComment"},method = {RequestMethod.POST})
@@ -32,20 +38,23 @@ public class CommentController {
                              @RequestParam("content") String content){
         try {
             Comment comment = new Comment();
+            comment.setContent(content);
             if (hostHolder.getUser() != null) {
                 comment.setUserId(hostHolder.getUser().getId());
             } else {
                 comment.setUserId(DemoUtil.ANONYMOUS_USERID);
-//            return "redirect:/relogin"
+//            return "redirect:/reglogin"
             }
-            comment.setContent(content);
+
             comment.setCreatedDate(new Date());
             comment.setEntityType(EntityType.ENTITY_QUESTION);//添加问题？？？
             comment.setEntityId(questionId);
-            comment.setStatus(0);
+            //comment.setStatus(0);
             commentService.addComment(comment);
             int count = commentService.getCommentCount(comment.getEntityId(),comment.getEntityType());
             questionService.updateCommentCount(comment.getEntityId(),count);
+            eventProducer.fireEvent(new EventModel(EventType.COMMENT).setActorId(comment.getUserId())
+                    .setEntityId(questionId));
         }catch (Exception e){
             logger.error("增加评论失败 "+e.getMessage());
         }
