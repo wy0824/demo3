@@ -77,6 +77,14 @@
 			<scope>compile</scope>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/org.apache.solr/solr-solrj -->
+		<dependency>
+			<groupId>org.apache.solr</groupId>
+			<artifactId>solr-solrj</artifactId>
+			<version>6.6.2</version>
+		</dependency>
+
+
 	</dependencies>
 
 	<build>

@@ -1,5 +1,8 @@
 package com.winter.demo3.controller;
 
+import com.winter.demo3.async.EventModel;
+import com.winter.demo3.async.EventProducer;
+import com.winter.demo3.async.EventType;
 import com.winter.demo3.model.*;
 import com.winter.demo3.service.*;
 import com.winter.demo3.util.DemoUtil;
@@ -31,6 +34,8 @@ public class QuestionController {
     LikeService likeService;
     @Autowired
     FollowService followService;
+    @Autowired
+    EventProducer eventProducer;
 
     @RequestMapping(value="/question/{qid}")
     public String questionDetail(Model model,@PathVariable("qid") int qid){
@@ -91,6 +96,9 @@ public class QuestionController {
                 question.setUserId(hostHolder.getUser().getId());
             }
             if(questionService.addQuestion(question) > 0){
+                eventProducer.fireEvent(new EventModel(EventType.ADD_QUESTION)
+                        .setActorId(question.getUserId()).setEntityId(question.getId())
+                        .setExts("title",question.getTitle()).setExts("content",question.getContent()));
                 return DemoUtil.getJSONString(0);
             }
         }catch(Exception e){
