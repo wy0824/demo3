@@ -214,10 +214,65 @@ model.addAttribute("map", map);
   </if>
 </select>
 ```
- **4. 注册及登录**
+  **4. 注册及登录**
  - token登记：与用户信息关联，session共享
+用数据库表单关联用户登录状态，表单设计如下：
+```SQL
+DROP TABLE IF EXISTS `login_ticket`;
+  CREATE TABLE `login_ticket` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `user_id` INT NOT NULL,
+    `ticket` VARCHAR(45) NOT NULL,
+    `expired` DATETIME NOT NULL,
+    `status` INT NULL DEFAULT 0,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `ticket_UNIQUE` (`ticket` ASC)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+```
+status=0表示已登录，1表示登出
+
  - Interceptor：
- - 用户密码加密：
+ 实现途径：实现HandlerInterceptor接口，或者实现WebRequestInterceptor接口。HandlerInterceptor接口代码：
+```java
+package org.springframework.web.servlet;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+public interface HandlerInterceptor {
+
+    boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
+        throws Exception;
+
+    void postHandle(
+            HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView)
+            throws Exception;
+
+    void afterCompletion(
+            HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
+            throws Exception;
+}
+```
+**preHandle**:在请求处理之前进行调用。SpringMVC 中的 Interceptor 是链式调用的，在一个应用中或者说是在一个请求中可以同时存在多个 Interceptor 。每个 Interceptor 的调用会依据它的声明顺序依次执行，而且最先执行的都是 Interceptor 中的 preHandle 方法，所以可以在这个方法中进行一些前置初始化操作或者是对当前请求做一个预处理，也可以在这个方法中进行一些判断来决定请求是否要继续进行下去。该方法的返回值是布尔值 Boolean 类型的，当它返回为 false 时，表示请求结束，后续的 Interceptor 和 Controller 都不会再执行；当返回值为 true 时，就会继续调用下一个 Interceptor 的 preHandle 方法，如果已经是最后一个 Interceptor 的时候，就会是调用当前请求的 Controller 中的方法。
+**postHandle**:需要当前对应的 Interceptor 的 preHandle 方法的返回值为 true 时才会执行,在当前请求进行处理之后，也就是在 Controller 中的方法调用之后执行，但是它会在 DispatcherServlet 进行视图返回渲染之前被调用，所以咱们可以在这个方法中对 Controller 处理之后的 ModelAndView 对象进行操作。
+**afterCompletion**:需要当前对应的 Interceptor 的 preHandle 方法的返回值为 true 时才会执行。因此，该方法将在整个请求结束之后，也就是在 DispatcherServlet 渲染了对应的视图之后执行，这个方法的主要作用是用于进行资源清理的工作。
+配置Interceptor方式：继承WebMvcConfigurerAdapter类，重写addInterceptors方法，完成拦截器的注册，或者通过配置XML文档。方法一示例代码：
+```java
+@Component
+public class DemoWebConfiguration extends WebMvcConfigurerAdapter{
+
+    @Autowired
+    PassportInterceptor passportInterceptor;
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(passportInterceptor);
+        super.addInterceptors(registry);
+    }
+}
+```
+
+ - 用户密码加密：MD5+salt
  **5. 敏感词过滤**
  - 前缀树：复杂度
  **6. 评论中心及站内信**
