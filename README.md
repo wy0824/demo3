@@ -22,44 +22,53 @@ IDE IntelliJ、jdk 1.8.0_25、Spring 4.0、MySQL 5.1.73、mybatis 1.2.2、redis 
 *切面（Aspect）：*一个关注点的模块化，这个关注点可能会横切多个对象。
 *切入点（Pointcut）：*匹配连接点的断言。
 *通知（Advice）：*
- - 前置通知（@Before）：在某连接点之前执行的通知，但这个通知不能阻止连接点之前的执行流程（除非它抛出一个异常）。
- - 后置通知（@AfterReturning）：在某连接点正常完成后执行的通知：例如，一个方法没有抛出任何异常，正常返回。
- - 异常通知（@AfterThrowing）：在方法抛出异常退出时执行的通知。
- - 最终通知（@After）：当某连接点退出的时候执行的通知（不论是正常返回还是异常退出）。
- - 环绕通知（@Around）：包围一个连接点的通知，如方法调用。这是最强大的一种通知类型。环绕通知可以在方法调用前后完成自定义的行为。它也会选择是否继续执行连接点或直接返回它自己的返回值或抛出异常来结束执行。
+  - 前置通知（@Before）：在某连接点之前执行的通知，但这个通知不能阻止连接点之前的执行流程（除非它抛出一个异常）。
+  - 后置通知（@AfterReturning）：在某连接点正常完成后执行的通知：例如，一个方法没有抛出任何异常，正常返回。
+  - 异常通知（@AfterThrowing）：在方法抛出异常退出时执行的通知。
+  - 最终通知（@After）：当某连接点退出的时候执行的通知（不论是正常返回还是异常退出）。
+  - 环绕通知（@Around）：包围一个连接点的通知，如方法调用。这是最强大的一种通知类型。环绕通知可以在方法调用前后完成自定义的行为。它也会选择是否继续执行连接点或直接返回它自己的返回值或抛出异常来结束执行。
  - **controller/service/DAO**
 通过注解方式表明对象的作用
 常见注解：
+
 @Component：泛指组件，当组件不好归类的时候，我们可以使用这个注解进行标注。
+
 @Service：用于标注业务层组件。
+
 @Controller：用于标注控制层组件。
+
 @Repository：用于标注数据访问组件，即DAO组件。
 
-@RequestMapping
+ - @RequestMapping
+ 
 RequestMapping是一个用来处理请求地址映射的注解，可用于类或方法上。用于类上，表示类中的所有响应请求的方法都是以该地址作为父路径。RequestMapping注解有六个属性，分成三类进行说明：
 
 *value*：     指定请求的实际地址，指定的地址可以是URI Template 模式（后面将会说明）；
+
 *method*：  指定请求的method类型， GET、POST、PUT、DELETE等；
 
 *consumes*： 指定处理请求的提交内容类型（Content-Type），例如application/json, text/html;
+
 *produces*:    指定返回的内容类型，仅当request请求头中的(Accept)类型中包含该指定类型才返回；
 
 *params*： 指定request中必须包含某些参数值是，才让该方法处理。
+
 *headers*： 指定request中必须包含某些指定的header值，才能让该方法处理请求。
+
 ```java
 //示例
 @RequestMapping(path = {"/user"},method = {RequestMethod.POST},params = "myParam=myValue",headers = "content-type=text/*")
 //请求地址为/user，请求方法为POST，请求参数为myParam=myValue，设置了headers
 ```
 
-@Mapper
-@Autowired
-
-
  **2. Velocity**
  - 实现前端和后台解耦
 常见语法说明：
-**2.1 注释：**单行##，多行#* *#
+
+**2.1 注释：**
+
+单行'##'，多行'#* *#'
+
 **2.2 引用：**
  - 引用变量：
 ```html
@@ -113,9 +122,10 @@ if/elseif/else
     **Go West**
 #end
 ```
-关系和逻辑运算符:==,&&,||,！
+ - 关系和逻辑运算符:==,&&,||,！
  - foreach循环
 当对象是array时：
+
 Controller：
 ```java
 List<String> colors = Arrays.asList(new String[]{"RED", "GREEN", "BLUE"});
@@ -128,6 +138,7 @@ model.addAttribute("colors", colors);
 #end
 ```
 当对象是map时
+
 Controller：
 ```java
 Map<String, String> map = new HashMap<String, String>();
@@ -143,12 +154,16 @@ model.addAttribute("map", map);
 #end
 ```
  - include 与 parse
+ 
  允许导入本地文件，区别在于include不做VTL语法解析，parse做VTL语法解析。
+ 
  **3. 数据库与iBatis集成**
  - **数据库**：数据库采用MySQL，在项目中共创建了6个数据库表单，分别为`question`、`user`、`login_ticket`、`comment`、`message`、`feed`，分别表示发布问题、注册用户信息、登录状态信息、问题评论、站内信、时间线消息
  - **iBatis集成**：
  可以通过注解或者XML的方式映射SQL语句
+ 
 *注解@Mapper*：@select，@update，@delete，@insert
+
 *XML*：
 ```xml
 <select id="selectPerson" parameterType="int" resultType="hashmap">
@@ -203,6 +218,7 @@ model.addAttribute("map", map);
  - choose (when, otherwise)
  - trim (where, set)
  - foreach
+ 
 例 *if* 判断:
 ```XML
 <select id="findActiveBlogWithTitleLike"
@@ -254,8 +270,11 @@ public interface HandlerInterceptor {
 }
 ```
 **preHandle**:在请求处理之前进行调用。SpringMVC 中的 Interceptor 是链式调用的，在一个应用中或者说是在一个请求中可以同时存在多个 Interceptor 。每个 Interceptor 的调用会依据它的声明顺序依次执行，而且最先执行的都是 Interceptor 中的 preHandle 方法，所以可以在这个方法中进行一些前置初始化操作或者是对当前请求做一个预处理，也可以在这个方法中进行一些判断来决定请求是否要继续进行下去。该方法的返回值是布尔值 Boolean 类型的，当它返回为 false 时，表示请求结束，后续的 Interceptor 和 Controller 都不会再执行；当返回值为 true 时，就会继续调用下一个 Interceptor 的 preHandle 方法，如果已经是最后一个 Interceptor 的时候，就会是调用当前请求的 Controller 中的方法。
+
 **postHandle**:需要当前对应的 Interceptor 的 preHandle 方法的返回值为 true 时才会执行,在当前请求进行处理之后，也就是在 Controller 中的方法调用之后执行，但是它会在 DispatcherServlet 进行视图返回渲染之前被调用，所以咱们可以在这个方法中对 Controller 处理之后的 ModelAndView 对象进行操作。
+
 **afterCompletion**:需要当前对应的 Interceptor 的 preHandle 方法的返回值为 true 时才会执行。因此，该方法将在整个请求结束之后，也就是在 DispatcherServlet 渲染了对应的视图之后执行，这个方法的主要作用是用于进行资源清理的工作。
+
 配置Interceptor方式：继承WebMvcConfigurerAdapter类，重写addInterceptors方法，完成拦截器的注册，或者通过配置XML文档。方法一示例代码：
 ```java
 @Component
@@ -273,11 +292,17 @@ public class DemoWebConfiguration extends WebMvcConfigurerAdapter{
 ```
 
  - 用户密码加密：MD5+salt
+ 
  **5. 敏感词过滤**[待补充]
+ 
  - 前缀树：复杂度
+ 
  **6. 评论中心及站内信**[待补充]
+ 
  **7. Redis**
+ 
 常见集合及命令（Jedis）：[参考](https://www.cnblogs.com/3chi/p/7209457.html)
+
 1.对value操作的命令
 
      exists(key)：确认一个key是否存在
@@ -446,7 +471,9 @@ public class DemoWebConfiguration extends WebMvcConfigurerAdapter{
 
      hgetall(key)：返回名称为key的hash中所有的键（field）及其对应的value
  - 应用：排序，异步队列，排行榜
+ 
  **8. 异步队列实现点赞与邮件发送**
+ 
  - 异步队列：尽快反馈给用户，Redis队列实现。包含以下内容
   - EventHandler:具体事件的接口类，包含事件处理函数doHandler及获取事件类型列表函数getSupportEventTypes
   - EventType：事件类型枚举
@@ -454,16 +481,19 @@ public class DemoWebConfiguration extends WebMvcConfigurerAdapter{
   - EventProducer：事件分发，将事件以Json格式序列化后写入Redis的list中。
   - EventConsumer：处理事件。实现InitializingBean接口，在初始化的时候自动注册所有事件。开启新的线程，不断查询是否有新的事件需要处理。通过异步队列避免了主线程的阻塞，提高程序效率。
   - handler包：实现EventHandler接口，重写doHandler方法，执行具体的事件。
- - 邮件发送：
+ - 邮件发送：[待补充]
+ 
  **9. 关注服务**[待补充]
+ 
  **10. timeline实现**[待补充]
  - 推拉模式
+ 
  **11. pyspider爬取网页内容**[待补充]
  - 效率
  - 防止ban
  - 解析方式
+ 
  **12. solr实现全文搜索**
- - solr：导入数据，去重（敏感hash）
   - 配置managed-schema文档，添加IKAnanlyzer分词配置，代码如下：
 ```XML
   <field name="question_title" type="text_ik" indexed="true" stored="true" multiValued="true"/>
@@ -518,4 +548,5 @@ password="nowcoder"/>
 ```
 程序框架如下：service层为`SearchService`，controller层为`SearchController`。SearchService中的searchQuestion函数返回搜索结果并加亮，indexQuestion函数实现新建索引。在QuestionController的addQuestion函数中实现`添加问题索引`异步事件的分发，具体事件为AddQuestionHandler。
  - IKAnalyzer：中文分词
+ 
  **13. 单元测试**[待补充]
