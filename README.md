@@ -6,7 +6,7 @@
 
 
 ## 简介 ##
-该项目主要是为了熟悉基于Spring框架的网页后台开发流程，此md文档也是学习过程的一个总结。项目中主要包括Spring框架、iBatis集成、用户注册、敏感词过滤、站内信、Redis实现赞踩功能、异步设计、邮件通知、timeline实现、爬虫、站内搜索、项目测试等内容。
+该项目主要是为了熟悉基于Spring框架的网页后台开发流程，此md文档也是学习过程的一个总结。项目中主要包括Spring框架、myBatis集成、用户注册、敏感词过滤、站内信、Redis实现赞踩功能、异步设计、邮件通知、timeline实现、爬虫、站内搜索、项目测试等内容。
 ## 版本说明 ##
 IDE IntelliJ、jdk 1.8.0_25、Spring 4.0、MySQL 5.1.73、mybatis 1.2.2、redis 2.9.0、solr 6.2.2
 
@@ -157,9 +157,9 @@ model.addAttribute("map", map);
  
  允许导入本地文件，区别在于include不做VTL语法解析，parse做VTL语法解析。
  
- **3. 数据库与iBatis集成**
+ **3. 数据库与myBatis集成**
  - **数据库**：数据库采用MySQL，在项目中共创建了6个数据库表单，分别为`question`、`user`、`login_ticket`、`comment`、`message`、`feed`，分别表示发布问题、注册用户信息、登录状态信息、问题评论、站内信、时间线消息
- - **iBatis集成**：
+ - **myBatis集成**：
  可以通过注解或者XML的方式映射SQL语句
  
 *注解@Mapper*：@select，@update，@delete，@insert
